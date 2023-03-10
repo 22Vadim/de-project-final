@@ -8,3 +8,9 @@ order by date_update
 SEGMENTED BY hash(date_update::date) all nodes
 PARTITION BY date_update::date
 GROUP BY calendar_hierarchy_day(date_update::date, 3, 2);
+
+CREATE PROJECTION IF NOT EXISTS currencies_by_dates as 
+SELECT * 
+FROM E8ECA156YANDEXBY__STAGING.currencies
+ORDER BY date_update 
+SEGMENTED BY hash(date_update::date) all nodes; 
