@@ -7,12 +7,15 @@ from typing import Dict, List, Optional
 import pendulum
 from airflow.decorators import dag, task
 import boto3
+import logging
 from airflow import DAG
 from airflow.models.variable import Variable
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from airflow.operators.python_operator import PythonOperator
  
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("s3_to_vertica")
 
 AWS_ACCESS_KEY_ID =  Variable.get("KEY")
 AWS_SECRET_ACCESS_KEY =  Variable.get("KEY_2")
@@ -48,6 +51,7 @@ def loading_buckets_transactions(Bucket: str):
         Bucket=Bucket,
         Key=f'transactions_batch_{i}.csv',
         Filename=f'/data/transactions_batch_{i}.csv') 
+        log.info(f'loading_buckets_transactions: /data/transactions_batch_{i}.csv')
 
 
 def loading_bucket_currencies(Bucket:str):
@@ -55,6 +59,7 @@ def loading_bucket_currencies(Bucket:str):
     Bucket=Bucket,
     Key='currencies_history.csv',
     Filename=f'/data/currencies_history.csv') 
+    
 
 
 def load_to_vertica(
@@ -93,6 +98,9 @@ def load_to_transactions(schema: str, table: str, columns: List[str]):
                         schema=schema,
                         table=table,
                         columns=columns)
+        
+        
+        
 
 
 

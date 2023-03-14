@@ -37,7 +37,7 @@ def update_global_metrics(ds):
     with vertica_python.connect(**conn_info) as conn:
         cur = conn.cursor()
         cur.execute(sql)
-        cur.execute("commit")
+        
 
 with DAG (
 	"second_dag",
