@@ -24,7 +24,7 @@ WITH t AS (
 	FROM E8ECA156YANDEXBY__STAGING.transactions_date t
 	WHERE account_number_to >=0
 		  AND account_number_from >=0
-	  	  AND transaction_date = {execution_date}
+	  	  AND transaction_date = {ds}
 ), c AS (	  
 	SELECT date_update,
 	   currency_code,
@@ -33,7 +33,7 @@ WITH t AS (
 	   ROW_NUMBER() OVER (PARTITION BY currency_code,  currency_code_with ORDER BY date_download DESC) as rn
 	FROM E8ECA156YANDEXBY__STAGING.currencies_date c 
 	WHERE currency_code = 420 -- USA
-		 AND date_update = {execution_date}
+		 AND date_update = {ds}
 )
 SELECT t.transaction_dt::date AS date_update,
 	   t.currency_code AS currency_from,

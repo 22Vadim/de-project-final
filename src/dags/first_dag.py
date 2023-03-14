@@ -33,29 +33,13 @@ aws_access_key_id=AWS_ACCESS_KEY_ID,
 aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
 )
 
-def create_table_currencies():
+def create_tables():
     vertica_conn = vertica_python.connect(**conn_info)
     cur = vertica_conn.cursor()
-    with open('/sql/currencies.sql') as f:
+    with open('/sql/tables.sql') as f:
         cur.execute(f.read())
     vertica_conn.commit()
-    vertica_conn.close()  
-
-def create_table_transactions():
-    vertica_conn = vertica_python.connect(**conn_info)
-    cur = vertica_conn.cursor()
-    with open('/sql/transactions.sql') as f:
-        cur.execute(f.read())
-    vertica_conn.commit()
-    vertica_conn.close() 
-
-def create_table_global_metrics():
-    vertica_conn = vertica_python.connect(**conn_info)
-    cur = vertica_conn.cursor()
-    with open('/sql/global_metrics.sql') as f:
-        cur.execute(f.read())
-    vertica_conn.commit()
-    vertica_conn.close()     
+    vertica_conn.close()    
 
 
 def loading_buckets_transactions(Bucket: str):
@@ -121,17 +105,9 @@ with DAG (
         is_paused_upon_creation=False
 	) as dag:
 
-    create_table_currencies = PythonOperator(
-    task_id='create_table_currencies',
-    python_callable=create_table_currencies)
-
-    create_table_transactions = PythonOperator(
-    task_id='create_table_transactions',
-    python_callable=create_table_transactions)
-
-    create_table_global_metrics = PythonOperator(
-    task_id='create_table_global_metrics',
-    python_callable=create_table_global_metrics)
+    create_tables = PythonOperator(
+    task_id='create_tables',
+    python_callable=create_tables)
 
     loading_buckets_transactions = PythonOperator(
 	task_id = 'loading_buckets_transactions',

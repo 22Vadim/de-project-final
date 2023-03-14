@@ -30,10 +30,10 @@ def create_tables_with_download_dates():
     vertica_conn.close()  
 
 
-def update_global_metrics(update_date):
+def update_global_metrics(ds):
     with open('/sql/update_global_metrics.sql') as f:
         sql = f.read()
-        sql = sql.format(execution_date="'"+str(update_date)+"'::timestamp")
+        sql = sql.format(execution_date="'"+str(ds)+"'::timestamp")
     with vertica_python.connect(**conn_info) as conn:
         cur = conn.cursor()
         cur.execute(sql)
@@ -48,13 +48,13 @@ with DAG (
         is_paused_upon_creation=False
 	) as dag:
 
-    create_tables_with_download_dates = PythonOperator(
+    crt_with_download_dates = PythonOperator(
     task_id='create_tables_with_download_dates',
     python_callable=create_tables_with_download_dates)
 
     update_global_metrics = PythonOperator(
     task_id='update_global_metrics',
     python_callable = update_global_metrics,
-    op_kwargs = {"update_date": '{{ds}}'})
+    op_kwargs = {"ds": '{{ds}}'})
 
     
